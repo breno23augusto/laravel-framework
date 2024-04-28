@@ -37,6 +37,24 @@ class CacheMemcachedStoreTest extends TestCase
         $this->assertSame('bar', $store->get('foo'));
     }
 
+    public function testFalseIsReturnedWhenKeyNotExits()
+    {
+        $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['get', 'getResultCode'])->getMock();
+        $memcache->expects($this->once())->method('get')->willReturn('bar');
+        $memcache->expects($this->once())->method('getResultCode')->willReturn(16);
+        $store = new MemcachedStore($memcache);
+        $this->assertFalse($store->has('foo'));
+    }
+
+    public function testTrueIsReturnedWhenKeyExits()
+    {
+        $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['get', 'getResultCode'])->getMock();
+        $memcache->expects($this->once())->method('get')->willReturn('bar');
+        $memcache->expects($this->once())->method('getResultCode')->willReturn(0);
+        $store = new MemcachedStore($memcache);
+        $this->assertTrue($store->has('foo'));
+    }
+
     public function testMemcacheGetMultiValuesAreReturnedWithCorrectKeys()
     {
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['getMulti', 'getResultCode'])->getMock();

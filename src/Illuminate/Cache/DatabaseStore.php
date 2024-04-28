@@ -429,4 +429,31 @@ class DatabaseStore implements LockProvider, Store
 
         return unserialize($value);
     }
+
+    /**
+     * Determine if an item exists in the cache.
+     *
+     * @param array|string $key
+     * @return bool
+     */
+    public function has($key)
+    {
+        $prefixed = $this->prefix.$key;
+
+        $cache = $this->table()->where('key', '=', $prefixed)->first();
+
+        if (is_null($cache)) {
+            return false;
+        }
+
+        $cache = is_array($cache) ? (object) $cache : $cache;
+
+        if ($this->currentTime() >= $cache->expiration) {
+            $this->forgetIfExpired($key);
+
+            return false;
+        }
+
+        return true;
+    }
 }

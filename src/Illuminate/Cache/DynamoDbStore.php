@@ -543,4 +543,33 @@ class DynamoDbStore implements LockProvider, Store
     {
         return $this->dynamo;
     }
+
+    /**
+     * Determine if an item exists in the cache.
+     *
+     * @param array|string $key
+     * @return bool
+     */
+    public function has($key)
+    {
+        $response = $this->dynamo->getItem([
+            'TableName' => $this->table,
+            'ConsistentRead' => false,
+            'Key' => [
+                $this->keyAttribute => [
+                    'S' => $this->prefix.$key,
+                ],
+            ],
+        ]);
+
+        if (! isset($response['Item'])) {
+            return false;
+        }
+
+        if ($this->isExpired($response['Item'])) {
+            return false;
+        }
+
+        return true;
+    }
 }

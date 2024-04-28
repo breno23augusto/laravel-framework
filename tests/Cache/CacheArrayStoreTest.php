@@ -325,4 +325,18 @@ class CacheArrayStoreTest extends TestCase
 
         $this->assertFalse($firstLock->isOwnedByCurrentProcess());
     }
+
+    public function testItemsCanBeSetAndHasReturnTrue()
+    {
+        $store = new ArrayStore;
+        $result = $store->put('foo', 'bar', 10);
+        $this->assertTrue($result);
+        $this->assertTrue($store->has('foo'));
+    }
+
+    public function testHasShouldReturnFalseIfKeyDoesNotExists()
+    {
+        $store = new ArrayStore;
+        $this->assertFalse($store->has('foo'));
+    }
 }

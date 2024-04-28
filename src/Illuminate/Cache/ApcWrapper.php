@@ -74,4 +74,15 @@ class ApcWrapper
     {
         return apcu_clear_cache();
     }
+
+    /**
+     * Determine if an item exists in the cache.
+     *
+     * @param string $key
+     * @return bool
+     */
+    public function exists($key)
+    {
+        return apcu_exists($key);
+    }
 }

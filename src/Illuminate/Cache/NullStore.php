@@ -123,4 +123,15 @@ class NullStore extends TaggableStore implements LockProvider
     {
         return '';
     }
+
+    /**
+     * Determine if an item exists in the cache.
+     *
+     * @param string $key
+     * @return bool
+     */
+    public function has($key)
+    {
+        return false;
+    }
 }

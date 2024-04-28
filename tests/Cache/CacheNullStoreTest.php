@@ -33,4 +33,10 @@ class CacheNullStoreTest extends TestCase
         $this->assertFalse($store->increment('foo'));
         $this->assertFalse($store->decrement('foo'));
     }
+
+    public function testFalseIsReturnedWhenKeyNotExits()
+    {
+        $store = new NullStore;
+        $this->assertFalse($store->has('foo'));
+    }
 }

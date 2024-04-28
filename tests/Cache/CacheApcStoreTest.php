@@ -132,4 +132,12 @@ class CacheApcStoreTest extends TestCase
         $result = $store->flush();
         $this->assertTrue($result);
     }
+
+    public function testAPCKeyExists()
+    {
+        $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['exists'])->getMock();
+        $apc->expects($this->once())->method('exists')->willReturn(true);
+        $store = new ApcStore($apc);
+        $this->assertTrue($store->has('foo'));
+    }
 }

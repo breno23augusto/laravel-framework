@@ -194,6 +194,40 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertEquals(2, $store->decrement('bar'));
     }
 
+    public function testFalseIsReturnedWhenKeyDoesNotExits()
+    {
+        $store = $this->getStore();
+        $table = m::mock(stdClass::class);
+        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
+        $table->shouldReceive('first')->once()->andReturnNull();
+
+        $this->assertFalse($store->has('foo'));
+    }
+
+    public function testTrueIsReturnedWhenKeyExitsAndItsNotExpired()
+    {
+        $store = $this->getStore();
+        $table = m::mock(stdClass::class);
+        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
+        $table->shouldReceive('first')->once()->andReturn((object) ['value' => serialize('bar'), 'expiration' => 999999999999999]);
+
+        $this->assertTrue($store->has('foo'));
+    }
+
+    public function testFalseIsReturnedWhenKeyExitsAndItsExpired()
+    {
+        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['forgetIfExpired'])->setConstructorArgs($this->getMocks())->getMock();
+        $table = m::mock(stdClass::class);
+        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
+        $table->shouldReceive('first')->once()->andReturn((object) ['expiration' => 1]);
+        $store->expects($this->once())->method('forgetIfExpired')->with($this->equalTo('foo'))->willReturn(null);
+
+        $this->assertFalse($store->has('foo'));
+    }
+
     protected function getStore()
     {
         return new DatabaseStore(m::mock(Connection::class), 'table', 'prefix');

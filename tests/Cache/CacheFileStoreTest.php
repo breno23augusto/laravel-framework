@@ -97,6 +97,33 @@ class CacheFileStoreTest extends TestCase
         $this->assertSame('Hello World', $store->get('foo'));
     }
 
+    public function testFalseIsReturnedWhenKeyDoesNotExits()
+    {
+        $files = $this->mockFilesystem();
+        $files->expects($this->once())->method('get')->willReturn(null);
+        $store = new FileStore($files, __DIR__);
+        $this->assertFalse($store->has('foo'));
+    }
+
+    public function testFalseIsReturnedWhenKeyExitsAndItsExpired()
+    {
+        $files = $this->mockFilesystem();
+        $contents = '0000000000';
+        $files->expects($this->once())->method('get')->willReturn($contents);
+        $store = $this->getMockBuilder(FileStore::class)->onlyMethods(['forget'])->setConstructorArgs([$files, __DIR__])->getMock();
+        $store->expects($this->once())->method('forget');
+        $this->assertFalse($store->has('foo'));
+    }
+
+    public function testTrueIsReturnedWhenKeyExitsAndItsNotExpired()
+    {
+        $files = $this->mockFilesystem();
+        $contents = '9999999999'.serialize('Hello World');
+        $files->expects($this->once())->method('get')->willReturn($contents);
+        $store = new FileStore($files, __DIR__);
+        $this->assertTrue($store->has('foo'));
+    }
+
     public function testStoreItemProperlyStoresValues()
     {
         $files = $this->mockFilesystem();

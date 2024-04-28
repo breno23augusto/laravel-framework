@@ -415,4 +415,15 @@ class FileStore implements Store, LockProvider
     {
         return '';
     }
+
+    /**
+     * Determine if an item exists in the cache.
+     *
+     * @param array|string $key
+     * @return bool
+     */
+    public function has($key)
+    {
+        return $this->getPayload($key)['data'] !== null;
+    }
 }

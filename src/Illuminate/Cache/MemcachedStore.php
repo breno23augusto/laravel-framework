@@ -276,4 +276,16 @@ class MemcachedStore extends TaggableStore implements LockProvider
     {
         $this->prefix = $prefix;
     }
+
+    /**
+     * Determine if an item exists in the cache.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function has($key)
+    {
+        $this->memcached->get($this->prefix.$key);
+        return $this->memcached->getResultCode() === \Memcached::RES_NOTFOUND;
+    }
 }

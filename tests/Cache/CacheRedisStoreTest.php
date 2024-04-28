@@ -30,6 +30,22 @@ class CacheRedisStoreTest extends TestCase
         $this->assertSame('foo', $redis->get('foo'));
     }
 
+    public function testFalseIsReturnedWhenKeyNotExits()
+    {
+        $redis = $this->getRedis();
+        $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
+        $redis->getRedis()->shouldReceive('exists')->once()->with('prefix:foo')->andReturn(false);
+        $this->assertFalse($redis->has('foo') );
+    }
+
+    public function testTrueIsReturnedWhenKeyExits()
+    {
+        $redis = $this->getRedis();
+        $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
+        $redis->getRedis()->shouldReceive('exists')->once()->with('prefix:foo')->andReturn(true);
+        $this->assertTrue($redis->has('foo'));
+    }
+
     public function testRedisMultipleValuesAreReturned()
     {
         $redis = $this->getRedis();

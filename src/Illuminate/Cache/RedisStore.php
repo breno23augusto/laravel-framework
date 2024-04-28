@@ -416,4 +416,15 @@ class RedisStore extends TaggableStore implements LockProvider
     {
         return is_numeric($value) ? $value : unserialize($value);
     }
+
+    /**
+     * Determine if an item exists in the cache.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function has($key)
+    {
+        return  $this->connection()->exists($this->prefix.$key);
+    }
 }

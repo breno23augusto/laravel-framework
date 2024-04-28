@@ -75,7 +75,7 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function has($key): bool
     {
-        return ! is_null($this->get($key));
+        return $this->store->has($key);
     }
 
     /**
